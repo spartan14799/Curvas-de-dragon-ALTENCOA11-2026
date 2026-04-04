@@ -1,24 +1,24 @@
-#Tema ponencia ALTENCOA 2026
+# Tema ponencia ALTENCOA 2026
 
 ## Curvas de dragón 
 
-###Introducción
+### Introducción
   - Breve marco histórico. 
   - Intuición: paperfolding.
 
-###Cómo podemos modelar matemáticamente esta intuición?
+### Cómo podemos modelar matemáticamente esta intuición?
   - Creación de palabras: alfabetos, palabras, concatenación, inversa, inversa opuesta, prefijo, sufijo.
   - La palabra del dragón (ilustrar, mostrar ambas maneras de definirla y enunciar equivalencia).
 
-###Computacional
+### Computacional
 # TODO: Hablar de la parte conmutacional de la palabra de dragón.
 
-###Características, propiedades.
+### Características, propiedades.
   - Semillas generadoras.
   - Teselaciones del plano.
   - No se autointerseca.
 
-###Perspectiva categórica de la auto-similaridad
+### Perspectiva categórica de la auto-similaridad
 Nociones básicas de categorías y coálgebras.
   - Objetos, morfismos, funtores. Ejemplo: categoría Top.
   - Endofuntores y G-coálgebras: el par (X, ξ: X → G(X)).
