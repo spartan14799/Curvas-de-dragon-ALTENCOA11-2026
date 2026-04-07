@@ -17,8 +17,6 @@
 - Visualicacion funciones genradoras de palabras.
 - Dar idea intuitiva de la Visualicacion de la curva a partir de la palabra.
 - Mostrar como cambia dependiendo de la semilla.
-- [] Referenciar bases y relacion con la curva.
-- [] Relacion base 2 con el giro.
 
 ### Características, propiedades
 
