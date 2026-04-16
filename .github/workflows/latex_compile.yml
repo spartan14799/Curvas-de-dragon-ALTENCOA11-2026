@@ -1,0 +1,27 @@
+name: latex compile 
+
+on:
+  push:
+    paths:
+      - 'proposal/**'
+      - '.github/workflows/latex_compile.yml'
+    branches: [ "main" ]
+
+jobs:
+  build_latex:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Descargar repositorio
+        uses: actions/checkout@v4
+
+      - name: Compilar PDF
+        uses: xu-cheng/latex-action@v3
+        with:
+          root_file: proposal/main.tex
+          working_directory: proposal/
+
+      - name: Subir PDF como artefacto
+        uses: actions/upload-artifact@v4
+        with:
+          name: Propuesta-Dragon-PDF
+          path: proposal/main.pdf
