@@ -1,6 +1,6 @@
 # Curvas del Dragón ALTENCOA11-2026
-
-Repositorio para la ponencia **"Curvas del Dragón revisitadas"** presentada en ALTENCOA 11 (2026).  
+# El respositiorio se encuentra en desarrollo
+Repositorio para la ponencia **"Curvas del Dragón"** presentada en ALTENCOA 11 (2026).  
 Exploramos la *palabra del dragón*, la *curva de Heighway* y su tratamiento categórico como coálgebra de un endofuntor, usando herramientas computacionales interactivas.
 
 ## 🧠 Contenido de la ponencia
