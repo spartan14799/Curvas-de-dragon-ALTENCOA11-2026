@@ -69,3 +69,13 @@ Por ejemplo, para generar la curva del dragón en PNG:
 julia --project=. scripts/generar_curva_dragon.jl
 ```
 Las imágenes se guardan en assets/.
+
+## 📜 Licencia
+Este proyecto se distribuye bajo la licencia MIT. Consulta el archivo LICENSE para más detalles.
+
+### Autores:
+```
+Juan Esteban Huertas Serrano – Universidad Nacional de Colombia
+Alejandro Manrique Roca – Pontificia Universidad Javeriana
+```
+ALTENCOA 11 – 2026
