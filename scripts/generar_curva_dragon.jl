@@ -31,8 +31,8 @@ end
 
 function generar_curva_png(
         n::Int;
-        alto_inicial::Int=1200,   # resolución de trabajo (más = más detalle)
-        ancho_final::Int=1200,    # tamaño de salida
+        alto_inicial::Int=3000,   # resolución de trabajo (más = más detalle)
+        ancho_final::Int=800,    # tamaño de salida
         archivo_final::String="curva_dragon.png"
     )
     println("Generando curva para n = $n")
@@ -47,7 +47,7 @@ function generar_curva_png(
     plot(xs, ys,
          line_z = t,
          color = grad,
-         linewidth = 0.8,         # muy fino para capturar detalle
+         linewidth = 2.0,         # muy fino para capturar detalle
          aspect_ratio = :equal,
          legend = false,
          axis = false,
@@ -67,6 +67,6 @@ function generar_curva_png(
     println("Imagen final guardada como '$archivo_final' ($(ancho_final)×$(ancho_final) px)")
 end
 
-# Ejecución
-n = 18
-generar_curva_png(n, alto_inicial=2500, ancho_final=1200, archivo_final="assets/curva_dragon.png")
+# Ejecucion
+n = 7
+generar_curva_png(n, alto_inicial=400, ancho_final=400, archivo_final="assets/curva_dragon1.png")

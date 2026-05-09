@@ -1,41 +1,30 @@
-module DragonCurve
+# src/DragonCurve.jl
 
-export palabra_dragon_rec, puntos_dragon
-
-"""
-    palabra_dragon_rec(n)
-
-Devuelve la palabra del dragón de orden `n` como una cadena de caracteres 'D' (valle) y 'U' (montaña).
-"""
-function palabra_dragon_rec(n::Int)::String
+function palabra_dragon(n::Int)::String
     if n == 0
         return ""
     else
-        prev = palabra_dragon_rec(n-1)
-        # Negar e invertir la palabra anterior
+        prev = palabra_dragon(n-1)
         neg_rev = reverse(map(c -> c == 'D' ? 'U' : 'D', prev))
         return prev * "D" * neg_rev
     end
 end
 
-"""
-    puntos_dragon(n)
-
-Genera los puntos (x,y) de la curva del dragón tras n iteraciones.
-Devuelve dos vectores: `xs`, `ys`.
-"""
 function puntos_dragon(n::Int)
-    palabra = palabra_dragon_rec(n)
-    dir = 1 + 0im                # dirección inicial (derecha)
-    giros = Dict('D' => im, 'U' => -im)   # giro antihorario / horario
-    puntos = [0 + 0im]           # origen
+    palabra = palabra_dragon(n)
+    dir = 1 + 0im
+    giros = Dict('U' => im, 'D' => -im)   
+    puntos = [0 + 0im]
     for c in palabra
         push!(puntos, puntos[end] + dir)
         dir *= giros[c]
     end
-    xs = real.(puntos)
-    ys = imag.(puntos)
-    return xs, ys
+    push!(puntos, puntos[end] + dir)
+    return real.(puntos), imag.(puntos)
 end
 
-end # module
+function teselacion_dragon(n::Int)
+    xs, ys = puntos_dragon(n)
+    z = xs .+ im .* ys
+    return z, z .* im, z .* -1, z .* -im
+end
