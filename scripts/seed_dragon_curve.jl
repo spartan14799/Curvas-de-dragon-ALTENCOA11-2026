@@ -3,18 +3,24 @@ using Plots
 gr()
 
 # ====================
-# PALETA DE COLORES EN LA GAMA AZUL
+# CATÁLOGO DE PALETAS DE COLORES
 # ====================
-const PALETA_AZULES = [
-    "#1d4ed8", # Azul rey
-    "#0f766e", # Verde azulado / Teal
-    "#4f46e5", # Índigo
-    "#0284c7", # Azul cian profundo
-    "#1e293b", # Azul pizarra oscuro
-    "#2563eb", # Azul cobalto
-    "#0369a1", # Azul océano
-    "#334155"  # Gris pizarra azulado
-]
+const PALETAS = Dict(
+    1 => ("Gama Azules Sobrios", 
+          ["#1d4ed8", "#0f766e", "#4f46e5", "#0284c7", "#1e293b", "#2563eb", "#0369a1", "#334155"]),
+          
+    2 => ("Gama Naranjas y Cálidos", 
+          ["#ea580c", "#d97706", "#c2410c", "#f59e0b", "#9a3412", "#b45309", "#d97706", "#f97316"]),
+          
+    3 => ("Combinación Azul y Naranja", 
+          ["#1d4ed8", "#ea580c", "#0284c7", "#f59e0b", "#1e3a8a", "#c2410c"]),
+          
+    4 => ("Ocean Teal / Verde Azulado", 
+          ["#0f172a", "#0f766e", "#133e4b", "#1e555c", "#2a7272", "#0284c7"]),
+          
+    5 => ("Pizarra y Neutros Fríos", 
+          ["#0f172a", "#1e293b", "#334155", "#475569", "#64748b"])
+)
 
 # ====================
 # LÓGICA DE TRANSFORMACIÓN DE SECUENCIAS
@@ -88,18 +94,27 @@ end
 # ====================
 
 """
-    graficar_curva_unica_semilla(seed, iteraciones; metodo=1, archivo_salida="", grosor=1.5)
+    graficar_curva_unica_semilla(seed, iteraciones; metodo=1, id_paleta=1, archivo_salida="", grosor=3.0)
 
 - `metodo = 1`: Recurrencia directa (S_{n+1} = S_n * S_1 * \bar{(S_n)^R})
 - `metodo = 2`: Producto de plegado (Intercalado)
+- `id_paleta`: Selección de paleta de colores (1 al 5)
 """
 function graficar_curva_unica_semilla(
         seed::AbstractString, 
         iteraciones::Int; 
         metodo::Int=1,
+        id_paleta::Int=1,
         archivo_salida::String="",
-        grosor::Real=3
+        grosor::Real=3.0
     )
+    # Validar paleta elegida
+    id_valido = haskey(PALETAS, id_paleta) ? id_paleta : 1
+    nombre_paleta, colores_paleta = PALETAS[id_valido]
+    
+    # Selección aleatoria de un color dentro de la paleta elegida
+    color_elegido = rand(colores_paleta)
+
     # Seleccionar algoritmo según la definición elegida
     word = metodo == 1 ? generate_word_direct(seed, iteraciones) : generate_word_folding(seed, iteraciones)
     nombre_metodo = metodo == 1 ? "Recurrencia Directa [S_{n+1} = S_n * S_1 * S̄_n^R]" : "Producto de Plegado [Intercalado]"
@@ -112,14 +127,13 @@ function graficar_curva_unica_semilla(
     println("Iteración (n): ", iteraciones)
     println("Palabra resultante: ", word)
     println("Longitud total: ", length(word), " caracteres")
+    println("Paleta seleccionada [$id_valido]: ", nombre_paleta)
+    println("Color elegido: ", color_elegido)
     println("==================================================\n")
 
-    color_elegido = rand(PALETA_AZULES)
-    println("Color seleccionado aleatoriamente: ", color_elegido)
-    
-    # Nombre de archivo por defecto según el método
+    # Nombre de archivo por defecto según el método y la paleta
     if isempty(archivo_salida)
-        archivo_salida = "../assets/seed-curves/$carpeta_submetodo/curva_dragon_$(uppercase(seed))_i$(iteraciones).png"
+        archivo_salida = "../assets/seed-curves/$carpeta_submetodo/curva_dragon_$(uppercase(seed))_i$(iteraciones)_p$(id_valido).png"
     end
 
     # Crear directorio si no existe
@@ -169,13 +183,17 @@ function main()
     seed = ""
     iter = 0
     metodo = 1
+    id_paleta = 1
 
     if length(ARGS) >= 2
-        # MODO CLI: julia script.jl <semilla> <iteraciones> [metodo: 1 o 2]
+        # MODO CLI: julia script.jl <semilla> <iteraciones> [metodo: 1 o 2] [id_paleta: 1-5]
         seed = ARGS[1]
         iter = parse(Int, ARGS[2])
         if length(ARGS) >= 3
             metodo = parse(Int, ARGS[3])
+        end
+        if length(ARGS) >= 4
+            id_paleta = parse(Int, ARGS[4])
         end
     else
         # MODO INTERACTIVO
@@ -195,9 +213,17 @@ function main()
         print("Opción (1/2) [por defecto 1]: ")
         input_metodo = strip(readline())
         metodo = isempty(input_metodo) ? 1 : parse(Int, input_metodo)
+
+        println("\nSelecciona la paleta de colores:")
+        for k in sort(collect(keys(PALETAS)))
+            println("  [$k]$(PALETAS[k][1])")
+        end
+        print("Opción (1-5) [por defecto 1]: ")
+        input_paleta = strip(readline())
+        id_paleta = isempty(input_paleta) ? 1 : parse(Int, input_paleta)
     end
 
-    graficar_curva_unica_semilla(seed, iter; metodo=metodo)
+    graficar_curva_unica_semilla(seed, iter; metodo=metodo, id_paleta=id_paleta)
 end
 
 main()
