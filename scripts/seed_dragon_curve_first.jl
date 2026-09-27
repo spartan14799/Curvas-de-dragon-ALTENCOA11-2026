@@ -70,7 +70,7 @@ function graficar_curva_unica_semilla(
     println("Color seleccionado aleatoriamente: ", color_elegido)
     
     if isempty(archivo_salida)
-        archivo_salida = "../assets/seed-curves/curva_dragon_$(uppercase(seed))_i$(iteraciones).png"
+        archivo_salida = "../assets/seed-curves/first_definition/curva_dragon_$(uppercase(seed))_i$(iteraciones).png"
     end
 
     dir_salida = dirname(archivo_salida)
