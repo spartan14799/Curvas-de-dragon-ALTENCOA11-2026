@@ -78,7 +78,7 @@ function graficar_4_dragones(
         con_ejes::Bool=true, 
         id_paleta::Int=1,
         archivo_salida::String="", 
-        grosor::Real=2.2
+        grosor::Real=5.0
     )
     # Validar paleta elegida
     id_valido = haskey(PALETAS, id_paleta) ? id_paleta : 1
