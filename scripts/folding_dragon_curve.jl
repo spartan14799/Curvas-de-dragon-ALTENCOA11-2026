@@ -1,10 +1,32 @@
+# ==============================================================================
+# folding_dragon_curve.jl — Autosemejanza del dragón: D = f₁(D) ∪ f₂(D)
+# ==============================================================================
+# Dibuja el dragón clásico (Heighway) dividido por su punto medio en dos copias
+# autosemejantes (Copia 1 y Copia 2) y marca el punto de pegado.
+#
+# Uso:     julia --project=. scripts/folding_dragon_curve.jl [OPCIONES]
+# Ayuda:   julia --project=. scripts/folding_dragon_curve.jl --help
+# Salida:  assets/self-similar-dragon/dragon_autosemejante_i<iter>.png
+# ==============================================================================
+
 using Plots
+
+include(joinpath(@__DIR__, "terminal_ui.jl"))
+using .TerminalUI
 
 gr()
 
-# ==========================================
+const ALIAS = Dict(
+    "--iter" => :iter,     "-i" => :iter,
+    "--grosor" => :grosor, "-g" => :grosor,
+    "--color1" => :color1, "-c1" => :color1,
+    "--color2" => :color2, "-c2" => :color2,
+    "--out" => :out,       "-o" => :out,
+)
+
+# ==============================================================================
 # 1. GENERACIÓN DEL DRAGÓN CLÁSICO (HEIGHWAY)
-# ==========================================
+# ==============================================================================
 
 function generar_giros_dragon(iteraciones::Int)
     giros = Int[]
@@ -19,9 +41,9 @@ end
 function giros_a_puntos(giros::Vector{Int})
     puntos = ComplexF64[0.0 + 0.0im]
     angulo = 0.0
-    
+
     push!(puntos, last(puntos) + cis(angulo))
-    
+
     for g in giros
         angulo += g * (π / 2)
         push!(puntos, last(puntos) + cis(angulo))
@@ -29,36 +51,47 @@ function giros_a_puntos(giros::Vector{Int})
     return puntos
 end
 
-# ==========================================
-# 2. GRAFICACIÓN DEL PLEGADO Y AUTOSEMEJANZA
-# ==========================================
+# ==============================================================================
+# 2. GRAFICACIÓN DEL PLEGADO Y LA AUTOSEMEJANZA
+# ==============================================================================
 
+"""
+    graficar_plegado_dragon(; iteraciones=10, color1, color2, grosor, archivo_salida="")
+
+Dibuja las dos copias autosemejantes del dragón y guarda el PNG.
+Devuelve la ruta del archivo.
+"""
 function graficar_plegado_dragon(;
         iteraciones::Int = 10,
-        color1::String = "#1d4ed8",  # Azul Rey (Copia 1)
-        color2::String = "#ea580c",  # Naranja Intenso (Copia 2)
+        color1::String = "#1d4ed8",   # Azul rey (Copia 1)
+        color2::String = "#ea580c",   # Naranja intenso (Copia 2)
         grosor::Real = 2.5,
         archivo_salida::String = ""
     )
-    if iteraciones < 2
-        error("El número de iteraciones debe ser al menos 2.")
-    end
+    t0 = time()
 
-    # Ruta por defecto en assets/self-similar-dragon
+    iteraciones < 2 && salir_con_error("El número de iteraciones debe ser al menos 2.")
+
     if isempty(archivo_salida)
-        dir_salida = "../assets/self-similar-dragon"
-        archivo_salida = joinpath(dir_salida, "dragon_autosemejante_i$(iteraciones).png")
+        archivo_salida = ruta_assets("self-similar-dragon",
+                                     "dragon_autosemejante_i$(iteraciones).png")
     else
-        dir_salida = dirname(archivo_salida)
+        mkpath(dirname(abspath(archivo_salida)))
     end
 
-    if !isempty(dir_salida) && !isdir(dir_salida)
-        mkpath(dir_salida)
-    end
+    seccion("Parámetros")
+    parametros(
+        "Iteraciones" => iteraciones,
+        "Copia 1"     => color1,
+        "Copia 2"     => color2,
+        "Grosor"      => grosor,
+    )
 
-    # Obtener puntos de la curva
+    seccion("Generación")
+    paso(1, 3, "Generando giros y puntos del dragón")
     giros = generar_giros_dragon(iteraciones)
     pts = giros_a_puntos(giros)
+    msg_info("Puntos de la curva: $(length(pts))")
 
     # División exacta por el punto medio en 2 copias autosemejantes
     total_puntos = length(pts)
@@ -68,119 +101,97 @@ function graficar_plegado_dragon(;
     pts_copia2 = pts[idx_medio:end]
     pt_plegado = pts[idx_medio]
 
-    # Crear figura sin ejes y formato apaisado/ancho
+    paso(2, 3, "Dibujando las dos copias y el punto de pegado")
     p = plot(
         aspect_ratio = :equal,
         framestyle = :none,
         grid = false,
         ticks = false,
-        
-        # Leyenda amplia y limpia
+
         legend = :topright,
         legendfont = font(25, :black),
         legendtitlefont = font(50, :bold, :black),
-        
-        # Formato ancho (1600x1000) y márgenes de seguridad
+
         size = (1600, 1000),
         margin = 15Plots.mm,
         background_color = :white
     )
 
-    # Trazar Copia 1: f1(D)
-    plot!(
-        p, real.(pts_copia1), imag.(pts_copia1),
-        color = color1,
-        linewidth = grosor,
-        label = "Copia 1"
-    )
+    # Copia 1: f₁(D)
+    plot!(p, real.(pts_copia1), imag.(pts_copia1),
+          color = color1, linewidth = grosor, label = "Copia 1")
 
-    # Trazar Copia 2: f2(D)
-    plot!(
-        p, real.(pts_copia2), imag.(pts_copia2),
-        color = color2,
-        linewidth = grosor,
-        label = "Copia 2"
-    )
+    # Copia 2: f₂(D)
+    plot!(p, real.(pts_copia2), imag.(pts_copia2),
+          color = color2, linewidth = grosor, label = "Copia 2")
 
-    # Marcador para el punto de plegado
-    scatter!(
-        p, [real(pt_plegado)], [imag(pt_plegado)],
-        color = :black,
-        markersize = 7,
-        markerstrokewidth = 1.5,
-        markerstrokecolor = :white,
-        label = "Punto de pegado"
-    )
+    # Punto de plegado
+    scatter!(p, [real(pt_plegado)], [imag(pt_plegado)],
+             color = :black,
+             markersize = 7,
+             markerstrokewidth = 1.5,
+             markerstrokecolor = :white,
+             label = "Punto de pegado")
 
+    paso(3, 3, "Guardando la imagen")
     savefig(p, archivo_salida)
-    println("Imagen generada exitosamente en: '$archivo_salida'")
-    return p
+
+    msg_resultado(archivo_salida; segundos = time() - t0)
+    return archivo_salida
 end
 
-# ==========================================
-# 3. MENÚ DE AYUDA Y PARSER CLI
-# ==========================================
+# ==============================================================================
+# 3. AYUDA
+# ==============================================================================
 
-function mostrar_ayuda()
-    println("""
-===================================================================
-VISUALIZADOR DEL DRAGÓN AUTOSEMEJANTE (Plegado f1(D) ∪ f2(D))
-===================================================================
-
-Uso:
-  julia folding_dragon_curve.jl [OPCIONES]
-
-Opciones disponibles:
-  -i, --iter <int>       Número de iteraciones (≥ 2) [defecto: 10]
-  -g, --grosor <float>   Grosor de la línea del gráfico [defecto: 2.5]
-  -c1, --color1 <hex>    Color en formato HEX/nombre para Copia 1 [defecto: #1d4ed8]
-  -c2, --color2 <hex>    Color en formato HEX/nombre para Copia 2 [defecto: #ea580c]
-  -o, --out <path>       Ruta del archivo de salida [defecto: ../assets/self-similar-dragon/...]
-  -h, --help             Muestra este menú de ayuda
-
-Ejemplos:
-  julia folding_dragon_curve.jl -h
-  julia folding_dragon_curve.jl -i 12 -g 3.0
-===================================================================
-""")
+function ayuda()
+    mostrar_ayuda(
+        titulo = "Dragón autosemejante: D = f₁(D) ∪ f₂(D)",
+        descripcion = "Plegado del dragón en dos copias unidas por el punto de pegado",
+        uso = "julia --project=. scripts/folding_dragon_curve.jl [OPCIONES]",
+        opciones = [
+            ("-i, --iter <int>",      "Número de iteraciones, ≥ 2 [defecto: 10]"),
+            ("-g, --grosor <float>",  "Grosor de la línea [defecto: 2.5]"),
+            ("-c1, --color1 <color>", "Color de la Copia 1, HEX o nombre [defecto: #1d4ed8]"),
+            ("-c2, --color2 <color>", "Color de la Copia 2, HEX o nombre [defecto: #ea580c]"),
+            ("-o, --out <ruta>",      "Archivo de salida [defecto: assets/self-similar-dragon/...]"),
+            ("-h, --help",            "Muestra esta ayuda"),
+        ],
+        ejemplos = [
+            "julia --project=. scripts/folding_dragon_curve.jl",
+            "julia --project=. scripts/folding_dragon_curve.jl -i 12 -g 3.0",
+            "julia --project=. scripts/folding_dragon_curve.jl -c1 \"#0f766e\" -c2 \"#d97706\"",
+        ],
+    )
 end
+
+# ==============================================================================
+# 4. PUNTO DE ENTRADA
+# ==============================================================================
 
 function main()
-    if any(arg -> arg in ["-h", "--help"], ARGS)
-        mostrar_ayuda()
+    if pide_ayuda(ARGS)
+        ayuda()
         return
     end
 
-    iteraciones = 10
-    grosor = 2.5
-    color1 = "#1d4ed8"
-    color2 = "#ea580c"
-    archivo_salida = ""
+    iteraciones, grosor, color1, color2, salida = 10, 2.5, "#1d4ed8", "#ea580c", ""
 
-    idx = 1
-    while idx <= length(ARGS)
-        arg = ARGS[idx]
-        if arg in ["--iter", "-i"] && idx < length(ARGS)
-            iteraciones = parse(Int, ARGS[idx+1]); idx += 2
-        elseif arg in ["--grosor", "-g"] && idx < length(ARGS)
-            grosor = parse(Float64, ARGS[idx+1]); idx += 2
-        elseif arg in ["--color1", "-c1"] && idx < length(ARGS)
-            color1 = ARGS[idx+1]; idx += 2
-        elseif arg in ["--color2", "-c2"] && idx < length(ARGS)
-            color2 = ARGS[idx+1]; idx += 2
-        elseif arg in ["--out", "-o"] && idx < length(ARGS)
-            archivo_salida = ARGS[idx+1]; idx += 2
-        else
-            idx += 1
-        end
-    end
+    banner("Dragón autosemejante: D = f₁(D) ∪ f₂(D)")
+
+    v = parsear_banderas(ARGS, ALIAS)
+    haskey(v, :iter)   && (iteraciones = a_entero(v[:iter], "--iter"))
+    haskey(v, :grosor) && (grosor = a_real(v[:grosor], "--grosor"))
+    haskey(v, :color1) && (color1 = v[:color1])
+    haskey(v, :color2) && (color2 = v[:color2])
+    haskey(v, :out)    && (salida = v[:out])
 
     graficar_plegado_dragon(
         iteraciones = iteraciones,
         color1 = color1,
         color2 = color2,
         grosor = grosor,
-        archivo_salida = archivo_salida
+        archivo_salida = salida
     )
 end
 
