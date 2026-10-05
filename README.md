@@ -182,14 +182,16 @@ son imágenes PNG**, que se guardan en `assets/`.
 
 - El sufijo `_sinejes` aparece cuando se usa `--ejes false`.
 - Con `--out <ruta>` puedes guardar la imagen en otro lugar.
-- `.gitignore` excluye `assets/` y `data/`. Para que una imagen se vea en este
-  README desde GitHub debe estar versionada (`git add -f assets/...`).
 
 ## Galería de ejemplos
 
-Las imágenes aparecen cuando se generan con los comandos indicados debajo de
-cada espacio. Cámbialos por los parámetros que prefieras y ajusta la ruta de la
-imagen en este README.
+### Curva del dragón sencilla
+
+<p align="center">
+  <img src="assets/basic-dragon/curva_dragon_i12_p1_sinejes.png" width="520" alt="Curva del dragón sencilla">
+  <br>
+  <sub><code>julia --project=. scripts/dragon_curve.jl -i 12 -p 1</code></sub>
+</p>
 
 ### Teselado del plano
 
@@ -260,7 +262,6 @@ msg_resultado(ruta_assets("mi-carpeta", "salida.png"))
 ## Licencia y autores
 
 Este proyecto se distribuye bajo la licencia MIT.
-<!-- TODO: añadir el archivo LICENSE a la raíz del repositorio. -->
 
 ### Autores
 
